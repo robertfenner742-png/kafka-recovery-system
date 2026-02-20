@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: offset_table_create.sql
+      relativeToChangelogFile: true
+  - include:
+      file: store_processed_message.sql
+      relativeToChangelogFile: true

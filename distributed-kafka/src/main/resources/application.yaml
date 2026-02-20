@@ -1,0 +1,26 @@
+spring:
+  threads:
+    virtual:
+      enabled: true
+  application:
+    name: distributed-kafka
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092,localhost:29093,localhost:29094}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: 1
+      retries: 3
+      properties:
+        linger.ms: 5
+
+server:
+  port: 1992
+  servlet:
+    context-path: /simulation
+
+logging:
+  level:
+    root: INFO
+    org.springframework.kafka: WARN
+    org.apache.kafka: WARN

@@ -1,0 +1,378 @@
+name: kafka-with-multi-broker-and-multi-region-cluster-setup-simulation
+
+services:
+  ########################################
+  # Kafka Cluster A - Region A with multiple brokers and Zookeepers
+  ########################################
+  kafka-cluster-a-broker-a:
+    image: confluentinc/cp-kafka:7.7.7
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-cluster-a-01:2181
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:9092,EXTERNAL://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-cluster-a-broker-a:9092,EXTERNAL://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+
+      ########################################
+      # Number of partitions for each topic created.
+      ########################################
+      KAFKA_NUM_PARTITIONS: 12
+
+      ########################################
+      # Additional settings for high availability and sync the topics in other brokers
+      ########################################
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 2
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+    depends_on:
+      - zookeeper-cluster-a-01
+      - zookeeper-cluster-a-02
+      - zookeeper-cluster-a-03
+
+  kafka-cluster-a-broker-b:
+    image: confluentinc/cp-kafka:7.7.7
+    ports:
+      - "9093:9092"
+      - "29093:29093"
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-cluster-a-02:2181
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:9093,EXTERNAL://0.0.0.0:29093
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-cluster-a-broker-b:9093,EXTERNAL://localhost:29093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+
+      ########################################
+      # Number of partitions for each topic created.
+      ########################################
+      KAFKA_NUM_PARTITIONS: 12
+
+      ########################################
+      # Additional settings for high availability and sync the topics in other brokers
+      ########################################
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 2
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+    depends_on:
+      - zookeeper-cluster-a-01
+      - zookeeper-cluster-a-02
+      - zookeeper-cluster-a-03  
+
+  kafka-cluster-a-broker-c:
+    image: confluentinc/cp-kafka:7.7.7
+    ports:
+      - "9094:9092"
+      - "29094:29094"
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-cluster-a-03:2181
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:9094,EXTERNAL://0.0.0.0:29094
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-cluster-a-broker-c:9094,EXTERNAL://localhost:29094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+
+      ########################################
+      # Number of partitions for each topic created.
+      ########################################
+      KAFKA_NUM_PARTITIONS: 12
+
+      ########################################
+      # Additional settings for high availability and sync the topics in other brokers
+      ########################################
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 2
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+    depends_on:
+      - zookeeper-cluster-a-01
+      - zookeeper-cluster-a-02
+      - zookeeper-cluster-a-03
+
+  zookeeper-cluster-a-01:
+    image: confluentinc/cp-zookeeper:7.7.7
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_SERVERS: >
+        zookeeper-cluster-a-01:2888:3888;
+        zookeeper-cluster-a-02:2888:3888;
+        zookeeper-cluster-a-03:2888:3888
+
+  zookeeper-cluster-a-02:
+    image: confluentinc/cp-zookeeper:7.7.7
+    ports:
+      - "2182:2181"
+    environment:
+      ZOOKEEPER_SERVER_ID: 2
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_SERVERS: >
+        zookeeper-cluster-a-01:2888:3888;
+        zookeeper-cluster-a-02:2888:3888;
+        zookeeper-cluster-a-03:2888:3888
+
+  zookeeper-cluster-a-03:
+    image: confluentinc/cp-zookeeper:7.7.7
+    ports:
+      - "2183:2181"
+    environment:
+      ZOOKEEPER_SERVER_ID: 3
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_SERVERS: >
+        zookeeper-cluster-a-01:2888:3888;
+        zookeeper-cluster-a-02:2888:3888;
+        zookeeper-cluster-a-03:2888:3888
+
+
+  ########################################
+  # Kafka Cluster B - Region B with single broker and Zookeeper
+  ########################################
+  kafka-cluster-b-broker-a:
+    image: confluentinc/cp-kafka:7.7.7
+    ports:
+      - "9095:9092"
+      - "29095:29095"
+    environment:
+      KAFKA_BROKER_ID: 4
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-cluster-b-01:2181
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:9095,EXTERNAL://0.0.0.0:29095
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-cluster-b-broker-a:9095,EXTERNAL://localhost:29095
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      ########################################
+      # Number of partitions for each topic created.
+      ########################################
+      KAFKA_NUM_PARTITIONS: 12
+
+      ########################################
+      # Additional settings for high availability and sync the topics in other brokers
+      ########################################
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 2
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+    depends_on:
+      - zookeeper-cluster-b-01
+      - zookeeper-cluster-b-02
+      - zookeeper-cluster-b-03
+  
+  kafka-cluster-b-broker-b:
+    image: confluentinc/cp-kafka:7.7.7
+    ports:
+      - "9096:9092"
+      - "29096:29096"
+    environment:
+      KAFKA_BROKER_ID: 5
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-cluster-b-02:2181
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:9096,EXTERNAL://0.0.0.0:29096
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-cluster-b-broker-b:9096,EXTERNAL://localhost:29096
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+
+      ########################################
+      # Number of partitions for each topic created.
+      ########################################
+      KAFKA_NUM_PARTITIONS: 12
+
+      ########################################
+      # Additional settings for high availability and sync the topics in other brokers
+      ########################################
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 2
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+    depends_on:
+      - zookeeper-cluster-b-01
+      - zookeeper-cluster-b-02
+      - zookeeper-cluster-b-03
+
+  kafka-cluster-b-broker-c:
+    image: confluentinc/cp-kafka:7.7.7
+    ports:
+      - "9097:9092"
+      - "29097:29097"
+    environment:
+      KAFKA_BROKER_ID: 6
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-cluster-b-03:2181
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:9097,EXTERNAL://0.0.0.0:29097
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-cluster-b-broker-c:9097,EXTERNAL://localhost:29097
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+
+      ########################################
+      # Number of partitions for each topic created.
+      ########################################
+      KAFKA_NUM_PARTITIONS: 12
+      
+      ########################################
+      # Additional settings for high availability and sync the topics in other brokers
+      ########################################
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 2
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+    depends_on:
+      - zookeeper-cluster-b-01
+      - zookeeper-cluster-b-02
+      - zookeeper-cluster-b-03
+
+  zookeeper-cluster-b-01:
+    image: confluentinc/cp-zookeeper:7.7.7
+    ports:
+      - "2184:2181"
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_SERVERS: >
+        zookeeper-cluster-b-01:2888:3888;
+        zookeeper-cluster-b-02:2888:3888;
+        zookeeper-cluster-b-03:2888:3888
+  
+  zookeeper-cluster-b-02:
+    image: confluentinc/cp-zookeeper:7.7.7
+    ports:
+      - "2185:2181"
+    environment:
+      ZOOKEEPER_SERVER_ID: 2
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_SERVERS: >
+        zookeeper-cluster-b-01:2888:3888;
+        zookeeper-cluster-b-02:2888:3888;
+        zookeeper-cluster-b-03:2888:3888
+
+  zookeeper-cluster-b-03:
+    image: confluentinc/cp-zookeeper:7.7.7
+    ports:
+      - "2186:2181"
+    environment:
+      ZOOKEEPER_SERVER_ID: 3
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_SERVERS: >
+        zookeeper-cluster-b-01:2888:3888;
+        zookeeper-cluster-b-02:2888:3888;
+        zookeeper-cluster-b-03:2888:3888
+
+  ########################################
+  # Kafka UI to manage both clusters
+  ########################################
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - "8087:8080"
+    environment:
+      # Configuration for Kafka Cluster A - Region A
+      KAFKA_CLUSTERS_0_NAME: 01-ha-local-cluster
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-cluster-a-broker-a:9092, kafka-cluster-a-broker-b:9093, kafka-cluster-a-broker-c:9094
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper-cluster-a-01:2181, zookeeper-cluster-a-02:2181, zookeeper-cluster-a-03:2181
+      
+      # Configuration for Kafka Cluster B - Region B
+      KAFKA_CLUSTERS_1_NAME: 02-ha-local-cluster
+      KAFKA_CLUSTERS_1_BOOTSTRAPSERVERS: kafka-cluster-b-broker-a:9095, kafka-cluster-b-broker-b:9096, kafka-cluster-b-broker-c:9097
+      KAFKA_CLUSTERS_1_ZOOKEEPER: zookeeper-cluster-b-01:2181, zookeeper-cluster-b-02:2181, zookeeper-cluster-b-03:2181
+    depends_on:
+      - kafka-cluster-a-broker-a
+      - kafka-cluster-a-broker-b
+      - kafka-cluster-a-broker-c
+      - kafka-cluster-b-broker-a
+      - kafka-cluster-b-broker-b
+      - kafka-cluster-b-broker-c
+
+  ########################################
+  # MirrorMaker2 to replicate data between Cluster A and Cluster B
+  ########################################
+  mm2:
+    container_name: MirrorMaker2
+    image: confluentinc/cp-kafka-connect:7.7.7
+    ports:
+      - "9022:9092"
+    environment:
+      # Sets the overall log level
+      CONNECT_LOG4J_ROOT_LOGLEVEL: "INFO"
+      # Set specific MM2 loggers to DEBUG if you are troubleshooting offset sync
+      CONNECT_LOG4J_LOGGERS: "org.apache.kafka.connect.mirror=DEBUG,org.apache.kafka.clients.admin=WARN"
+      # This ensures the standard Confluent logging setup is triggered
+      KAFKA_LOG4J_OPTS: "-Dlog4j.configuration=file:/etc/kafka/connect-log4j.properties"
+    # environment:
+    #   MIRROR_MAKER_2_CONFIG_FILE: /mm2/mm2.properties
+    volumes:
+      - ./mm2.properties:/etc/kafka/mm2.properties
+    command: >
+      bash -c "
+      connect-mirror-maker /etc/kafka/mm2.properties
+      "
+    depends_on:
+      - kafka-cluster-a-broker-a
+      - kafka-cluster-a-broker-b
+      - kafka-cluster-a-broker-c
+      - kafka-cluster-b-broker-a
+      - kafka-cluster-b-broker-b
+      - kafka-cluster-b-broker-c
+
+  postgres-database:
+    image: postgres:16-alpine
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydb
+    ports:
+      - "5436:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d mydb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # kafka-consumer-app:
+  #   build:
+  #     context: ../distributer-kafka-consumer
+  #     dockerfile: Dockerfile
+  #   image: distributed-kafka-consumer:latest
+  #   environment:
+  #     DB_HOST: postgres
+  #     DB_PORT: 5432
+  #     PRIMARY_BOOTSTRAP_SERVERS: kafka-cluster-a-broker-a:9092,kafka-cluster-a-broker-b:9093,kafka-cluster-a-broker-c:9094
+  #     SECONDARY_BOOTSTRAP_SERVERS: kafka-cluster-b-broker-a:9095,kafka-cluster-b-broker-b:9096,kafka-cluster-b-broker-c:9097
+  #   restart: on-failure
+  #   deploy:
+  #     replicas: 3
+  #   depends_on:
+  #     - postgres-database
+
+
+  kafka-producer-app:
+    build:
+      context: ../distributed-kafka
+      dockerfile: Dockerfile
+    image: distributed-kafka:latest
+    ports:
+      - "1992:1992"
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka-cluster-a-broker-a:9092,kafka-cluster-a-broker-b:9093,kafka-cluster-a-broker-c:9094
+    restart: on-failure
+    deploy:
+      replicas: 1
+    depends_on:
+      - kafka-cluster-a-broker-a
+      - kafka-cluster-a-broker-b
+      - kafka-cluster-a-broker-c
+  
+  prometheus-metrics-scrapper:
+    container_name: prometheus-server
+    image: prom/prometheus:v3.5.1
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana-ui:
+    container_name: grafana-dashboard
+    image: grafana/grafana:12.3
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - prometheus-metrics-scrapper
