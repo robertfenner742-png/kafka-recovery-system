@@ -325,21 +325,21 @@ services:
       timeout: 5s
       retries: 5
 
-  # kafka-consumer-app:
-  #   build:
-  #     context: ../distributer-kafka-consumer
-  #     dockerfile: Dockerfile
-  #   image: distributed-kafka-consumer:latest
-  #   environment:
-  #     DB_HOST: postgres
-  #     DB_PORT: 5432
-  #     PRIMARY_BOOTSTRAP_SERVERS: kafka-cluster-a-broker-a:9092,kafka-cluster-a-broker-b:9093,kafka-cluster-a-broker-c:9094
-  #     SECONDARY_BOOTSTRAP_SERVERS: kafka-cluster-b-broker-a:9095,kafka-cluster-b-broker-b:9096,kafka-cluster-b-broker-c:9097
-  #   restart: on-failure
-  #   deploy:
-  #     replicas: 3
-  #   depends_on:
-  #     - postgres-database
+  kafka-consumer-app:
+    build:
+      context: ../distributer-kafka-consumer
+      dockerfile: Dockerfile
+    image: distributed-kafka-consumer:latest
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      PRIMARY_BOOTSTRAP_SERVERS: kafka-cluster-a-broker-a:9092,kafka-cluster-a-broker-b:9093,kafka-cluster-a-broker-c:9094
+      SECONDARY_BOOTSTRAP_SERVERS: kafka-cluster-b-broker-a:9095,kafka-cluster-b-broker-b:9096,kafka-cluster-b-broker-c:9097
+    restart: on-failure
+    deploy:
+      replicas: 3
+    depends_on:
+      - postgres-database
 
 
   kafka-producer-app:
